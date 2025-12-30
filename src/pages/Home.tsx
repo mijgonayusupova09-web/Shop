@@ -1,112 +1,96 @@
-import React from 'react'
-import { Section1 } from './home/section1'
-import { ChevronRight } from 'lucide-react'
-import img1 from "../assets/Fill With Left Arrow.png"
-import img2 from "../assets/Fill with Right Arrow.png"
-import { ProductCrad1 } from './home/productCrad1'
-import { ProductCrad2 } from './home/productCrad2'
-import { ProductCrud3 } from './home/productCrud3'
-import { Categories } from './home/categories'
+import { useEffect, useState } from "react";
+import { Card, Button, Row, Col, Spin, Badge } from "antd";
+import { HeartOutlined, HeartFilled, EyeOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { useGetProductsQuery } from "../store/api/productApi/product";
+import { addToCart, toggleWishlist, getWishlist } from "../store/api/cardApi/cart";
+import type { Product } from "../store/api/cardApi/types";
 
-export const Home = () => {
+const { Meta } = Card;
+
+export const Home: React.FC = () => {
+  const { data, isLoading } = useGetProductsQuery();
+  const [wishlist, setWishlist] = useState<Product[]>([]);
+
+  useEffect(() => {
+    setWishlist(getWishlist());
+  }, []);
+
+  const handleWishlist = (product: Product) => {
+    const updated = toggleWishlist(product);
+    setWishlist(updated);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    if (!localStorage.getItem("token")) {
+      alert("Login required! Please login to add to cart.");
+      return;
+    }
+    addToCart(product);
+    alert(`${product.productName} added to cart`);
+  };
+
+  if (isLoading) return <Spin size="large" className="flex justify-center mt-20" />;
+
   return (
-    <div className='h-[900vh] w-[90%] m-auto mt-[40px]'>
-      <div className="flex justify-between">
-        <div className="">
-          <p>Woman’s Fashion<ChevronRight className="inline ml-[70px]" /></p>
-          <p className='mt-[13px]'>Men’s Fashion<ChevronRight className="inline ml-[90px]" /></p>
-          <p className='mt-[13px]'>Electronics</p>
-          <p className='mt-[13px]'>Home & Lifestyle</p>
-          <p className='mt-[13px]'>Medicine</p>
-          <p className='mt-[13px]'>Sports & Outdoor</p>
-          <p className='mt-[13px]'>Baby’s & Toys</p>
-          <p className='mt-[13px]'>Groceries & Pets</p>
-          <p className='mt-[13px]'>Health & Beauty</p>
-        </div>
-        <Section1 />
-      </div>
-      <div className="flex items-center gap-[10px] mt-[30px]">
-        <div className="w-[25px] h-[50px] bg-[#DB4444] rounded-[8px]"></div>
-        <p className='text-[#DB4444]'>Today’s</p>
-      </div>
-      <div className="flex justify-between ">
-        <div className="flex gap-[100px] items-end">
-          <p className='text-[30px] font-bold '>Flash Sales</p>
-          <div className="flex items-end gap-[10px]">
-            <div className="">
-              <p className='text-[12px]'>Days</p>
-              <h1 className='text-[30px] font-bold'>03</h1>
-            </div>
-            <p className='text-[30px] font-bold text-[#E07575]'>:</p>
-            <div className="">
-              <p className='text-[12px]'>Hours</p>
-              <h1 className='text-[30px] font-bold'>23</h1>
-            </div>
-            <p className='text-[30px] font-bold text-[#E07575]'>:</p>
-            <div className="">
-              <p className='text-[12px]'>Minutes</p>
-              <h1 className='text-[30px] font-bold'>19</h1>
-            </div>
-            <p className='text-[30px] font-bold text-[#E07575]'>:</p>
-            <div className="">
-              <p className='text-[12px]'>Seconds</p>
-              <h1 className='text-[30px] font-bold'>56</h1>
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-[10px]">
-          <img src={img1} alt="" />
-          <img src={img2} alt="" />
-        </div>
-      </div>
-      <div className="flex justify-between mt-[20px]">
-        <ProductCrad1 />
-        <ProductCrad1 />
-        <ProductCrad1 />
-        <ProductCrad1 />
+    <div className="max-w-7xl mx-auto px-4 mt-10">
+      <Row gutter={[16, 16]}>
+        {data?.data?.products?.map((item: Product) => {
+          const isWishlisted = wishlist.some(p => p.id === item.id);
+          return (
+            <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+              <Badge.Ribbon
+                text="NEW"
+                color="green"
+                style={{ display: item.discountPrice ? "block" : "none" }}
+              >
+                <Card
+                  hoverable
+                  cover={
+                    <Link to={`/product/${item.id}`}>
+                      <img
+                        alt={item.productName}
+                        src={`https://store-api.softclub.tj/images/${item.image}`}
+                        style={{ height: 220, objectFit: "contain", padding: 16 }}
+                      />
+                    </Link>
+                  }
+                  actions={[
+                    <Button
+                      type="text"
+                      icon={isWishlisted ? <HeartFilled style={{ color: "red" }} /> : <HeartOutlined />}
+                      onClick={() => handleWishlist(item)}
+                    />,
+                    <Link to={`/product/${item.id}`}>
+                      <Button type="text" icon={<EyeOutlined />} />
+                    </Link>,
+                    <Button type="primary" onClick={() => handleAddToCart(item)}>
+                      Add to Cart
+                    </Button>,
+                  ]}
+                >
+                  <Meta
+                    title={item.productName}
+                    description={
+                      <span className="text-red-500 font-bold">
+                        ${item.discountPrice ?? item.price}
+                      </span>
+                    }
+                  />
+                </Card>
+              </Badge.Ribbon>
+            </Col>
+          );
+        })}
+      </Row>
 
+      <div className="flex justify-center mt-10">
+        <Link to="/shop">
+          <Button type="default" size="large">
+            All Products
+          </Button>
+        </Link>
       </div>
-      <button className='w-[200px] h-[50px] text-[white] ml-[450px] mt-[30px] bg-[#DB4444]'>View All Products</button>
-      <div className="flex items-center gap-[10px] mt-[30px]">
-        <div className="w-[25px] h-[50px] bg-[#DB4444] rounded-[8px]"></div>
-        <p className='text-[#DB4444]'>Categories</p>
-      </div>
-      <div className="flex justify-between ">
-        <div className="flex gap-[100px] items-end">
-          <p className='text-[30px] font-bold '>Browse By Category</p>
-        </div>
-        <div className="flex gap-[10px]">
-          <img src={img1} alt="" />
-          <img src={img2} alt="" />
-        </div>
-      </div>
-      <div className="flex justify-between">
-        <ProductCrad2 />
-        <ProductCrad2 />
-        <ProductCrad2 />
-        <ProductCrad2 />
-        <ProductCrad2 />
-        <ProductCrad2 />
-      </div>
-      <div className="flex items-center gap-[10px] mt-[30px]">
-        <div className="w-[25px] h-[50px] bg-[#DB4444] rounded-[8px]"></div>
-        <p className='text-[#DB4444]'>This Month</p>
-      </div>
-      <div className="flex justify-between ">
-        <div className="flex gap-[100px] items-end">
-          <p className='text-[30px] font-bold '>Best Selling Products</p>
-        </div>
-        <button className='w-[150px] h-[48px] rounded-[3px] bg-[#DB4444] text-[white]'>View All</button>
-      </div>
-      <div className="mt-[30px] flex justify-between">
-        <ProductCrud3 />
-        <ProductCrud3 />
-        <ProductCrud3 />
-        <ProductCrud3 />
-      </div>
-
-      <Categories/>
     </div>
-
-  )
-}
+  );
+};

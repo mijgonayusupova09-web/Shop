@@ -4,67 +4,67 @@ import img2 from "../../assets/Icon-Facebook.png"
 import img3 from "../../assets/Icon-Twitter.png"
 import img4 from "../../assets/icon-instagram.png"
 import img5 from "../../assets/Icon-Linkedin.png"
-import '../../App'
 
 export const Footer = () => {
+  const accountLinks = ["My Account","Cart","Wishlist","Shop"];
+  const quickLinks = ["Privacy Policy","Terms Of Use","FAQ","Contact"];
+  const socialIcons = [img2,img3,img4,img5];
+
   return (
-    <div>
-      <div className="bb w-[100%] h-[67vh] bg-[black] text-[white]">
-       <div className="w-[90%] m-auto flex justify-between pt-[70px]">
-        <div className="">
-          <h1 className='text-[20px]'>Exclusive</h1>
-          <br />
-          <p >Subscribe</p>
-          <p className='mt-[10px]'>Get 10% off your first order</p>
-            <div className="relative hidden md:block mt-[10px]">
+    <footer className="bg-black text-white pt-16 pb-[10px] mt-[40px]">
+      <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-12 px-4">
+
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold">Exclusive</h1>
+          <p className="mt-4">Subscribe</p>
+          <p className="mt-2">Get 10% off your first order</p>
+
+          <div className="relative mt-4">
             <input
               type="text"
               placeholder="Enter your email"
-              className="w-56 rounded-[3px] border px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full md:w-56 rounded-sm border px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-black"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <img src={img1} alt="" />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition">
+              <img src={img1} alt="Send" className="w-5 h-5"/>
             </span>
           </div>
+        </div>
+
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold">Support</h1>
+          <p className="mt-4 text-sm">111 Bijoy sarani, Dhaka, <br /> DH 1515, Bangladesh.</p>
+          <p className="mt-2 text-sm hover:text-[#DB4444] cursor-pointer transition">exclusive@gmail.com</p>
+          <p className="mt-2 text-sm hover:text-[#DB4444] cursor-pointer transition">+88015-88888-9999</p>
+        </div>
+
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold">Account</h1>
+          {accountLinks.map((item, i) => (
+            <p key={i} className="mt-2 text-sm hover:text-[#DB4444] cursor-pointer transition">{item}</p>
+          ))}
+        </div>
+
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold">Quick Link</h1>
+          {quickLinks.map((item, i) => (
+            <p key={i} className="mt-2 text-sm hover:text-[#DB4444] cursor-pointer transition">{item}</p>
+          ))}
+        </div>
+        <div className="flex-1">
+          <h1 className="text-lg font-semibold">Social</h1>
+          <div className="flex items-center gap-3 mt-4">
+            {socialIcons.map((icon, i) => (
+              <img key={i} src={icon} alt={`social-${i}`} className="w-6 h-6 cursor-pointer hover:scale-110 transition" />
+            ))}
           </div>
-          <div className="">
-            <h1 className='text-[20px]'>Support</h1>
-            <br />
-            <p className='mt-[10px]'>111 Bijoy sarani, Dhaka, <br />
-               DH 1515, Bangladesh.</p>
-               <p className='mt-[10px]'>exclusive@gmail.com</p>
-               <p className='mt-[10px]'>+88015-88888-9999</p>
-          </div>
-          <div className="">
-            <p className='text-[20px]'>Account</p>
-            <br />
-            <p className='mt-[10px]'>My Account</p>
-            <p className='mt-[10px]'>Cart</p>
-            <p className='mt-[10px]'>Wishlist</p>
-            <p className='mt-[10px]'>Shop</p>
-          </div>
-          <div className="">
-            <h1 className='text-[20px]'>Quick Link</h1>
-            <br />
-            <p >Privacy Policy</p>
-            <p className='mt-[10px]'>Terms Of Use</p>
-            <p className='mt-[10px]'>FAQ</p>
-            <p className='mt-[10px]'>Contact</p>
-          </div>
-          <div className="">
-            <h1 className='text-[20px]'>Social </h1>
-            <br />
-            <div className="flex items-center gap-[10px]">
-              <img src={img2} alt="" />
-              <img src={img3} alt="" />
-              <img src={img4} alt="" />
-              <img src={img5} alt="" />
-            </div>
-          </div>
-       </div>
-       <hr className='mt-[70px] text-[#191919]' />
-       <h1 className='text-center mt-[20px] text-[14px] text-[grey]'>Copyright Rimel 2022. All right reserved</h1>
+        </div>
       </div>
-    </div>
+
+      <hr className="border-gray-800 my-8 " />
+      <p className="text-center text-gray-400 text-sm mb-8">
+        Copyright Rimel 2022. All rights reserved
+      </p>
+    </footer>
   )
 }
