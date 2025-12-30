@@ -1,28 +1,13 @@
-import { API, baseApi } from "../../../utils/api";
+import { baseApi } from "../../../utils/api";
 
-export interface ProductImage {
-  images: string;
-}
-
-export interface ProductFromList {
+export interface Product {
   id: number;
   productName: string;
   price: number;
-  discountPrice: number;
-  hasDiscount: boolean;
-  color: string;
+  discountPrice?: number;
   image: string;
-}
-
-export interface Product extends Omit<ProductFromList, "images"> {
-  images: ProductImage[];
   description: string;
   brand: string;
-  code: number;
-  productName: string;
-  brandId?: number;
-  subCategoryId?: number;
-  colorId?: number;
   categoryId?: number;
 }
 
@@ -33,9 +18,8 @@ export const productApi = baseApi.injectEndpoints({
       providesTags: ['Product'],
     }),
     
-    // ✅ Add this endpoint to fetch a single product by ID
     getProductById: builder.query<Product, number>({
-      query: (id) => `/Product/get-product-by-id?id=${id}`,
+      query: (id) => `/Product/get-product-by-id/${id}`, 
       providesTags: (result, error, id) => [{ type: 'Product', id }],
     }),
   }),

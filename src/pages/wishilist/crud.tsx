@@ -1,49 +1,58 @@
-import { motion } from "framer-motion";
-import imgCart from "../../assets/Cart1 (1).png";
-import star from "../../assets/Five star.png";
-import { addToCart, toggleWishlist } from "../../store/api/cardApi/cart";
+import { Link } from "react-router-dom";
+import { Card, Button, Row, Col } from "antd";
+import { EyeOutlined, HeartFilled, HeartOutlined } from "@ant-design/icons";
+import { addToCart, getWishlist, toggleWishlist } from "../../store/api/cardApi/cart";
+import type { Product } from "../../store/api/cardApi/types";
 
-export const Crud = ({ product, onUpdate }) => {
-  const remove = () => {
-    toggleWishlist(product);
-    onUpdate();
-    window.dispatchEvent(new Event("storage"));
-  };
+const { Meta } = Card;
 
-  const add = () => {
-    addToCart(product);
-    window.dispatchEvent(new Event("storage"));
-  };
+interface Props {
+  products: Product[];
+}
+
+export const ProductGrid: React.FC<Props> = ({ products }) => {
+  const wishlist = getWishlist();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, y: -40 }}
-      className="bg-white rounded-xl shadow p-4"
-    >
-      <div className="relative bg-[#f7f7f7] h-[200px] rounded-xl">
-        <button onClick={remove} className="absolute top-2 right-2 bg-white rounded-full px-2">✕</button>
-        <img
-          src={`https://store-api.softclub.tj/images/${product.image}`}
-          className="h-full mx-auto p-6"
-        />
-      </div>
+    <Row gutter={[16, 16]}>
+      {products.map((item) => {
+        const isWishlisted = wishlist.some(p => p.id === item.id);
 
-      <button onClick={add} className="w-full mt-4 bg-black text-white py-2 rounded hover:bg-[#DB4444]">
-        <img src={imgCart} className="w-5 inline mr-2" />
-        Add To Cart
-      </button>
-
-      <h2 className="mt-3 font-semibold">{product.productName}</h2>
-      <span className="text-[#DB4444] font-bold">
-        ${product.discountPrice ?? product.price}
-      </span>
-
-      <div className="flex gap-2 mt-2">
-        <img src={star} className="w-20" />
-        <span>(88)</span>
-      </div>
-    </motion.div>
+        return (
+          <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+            <Card
+              hoverable
+              cover={
+                <Link to={`/product/${item.id}`}>
+                  <img
+                    alt={item.productName}
+                    src={`https://store-api.softclub.tj/images/${item.image}`}
+                    className="h-56 object-contain p-4"
+                  />
+                </Link>
+              }
+              actions={[
+                <Button
+                  type="text"
+                  icon={isWishlisted ? <HeartFilled style={{ color: "red" }} /> : <HeartOutlined />}
+                  onClick={() => toggleWishlist(item)}
+                />,
+                <Link to={`/product/${item.id}`}>
+                  <Button type="text" icon={<EyeOutlined />} />
+                </Link>,
+                <Button type="primary" onClick={() => addToCart(item)}>
+                  Add to Cart
+                </Button>,
+              ]}
+            >
+              <Meta
+                title={item.productName}
+                description={<span className="text-red-500 font-bold">${item.discountPrice ?? item.price}</span>}
+              />
+            </Card>
+          </Col>
+        );
+      })}
+    </Row>
   );
 };

@@ -1,28 +1,33 @@
 import { useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Loader } from "../components/layout/ui/Loader";
-import { addToCart, toggleWishlist, getWishlist } from "../store/api/cardApi/cart";
 import { useGetProductByIdQuery } from "../store/api/productApi/product";
+import { addToCart, toggleWishlist, getWishlist } from "../store/api/cardApi/cart";
+import { useState, useEffect } from "react";
+import { Loader } from "../components/layout/ui/Loader";
 import imgHeart from "../assets/heart small.png";
 
 export const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: product, isLoading } = useGetProductByIdQuery(Number(id));
+  const { data: product, isLoading, isError } = useGetProductByIdQuery(Number(id));
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-  if (isLoading || !product) return <Loader />;
+  useEffect(() => {
+    if (product) {
+      setIsWishlisted(getWishlist().some(p => p.id === product.id));
+    }
+  }, [product]);
 
-  const wishlist = getWishlist();
-  const isWishlisted = wishlist.some(p => p.id === product.id);
+  if (isLoading) return <Loader />;
+  if (isError || !product) return <div className="text-center mt-20">Product not found</div>;
 
   const handleWishlist = () => {
     toggleWishlist(product);
-    // force update UI
+    setIsWishlisted(getWishlist().some(p => p.id === product.id));
     window.dispatchEvent(new Event("storage"));
   };
 
   const handleAddToCart = () => {
     if (!localStorage.getItem("token")) {
-      alert("Login required! Please login to add to cart.");
+      alert("Login required!");
       return;
     }
     addToCart(product);
@@ -32,17 +37,15 @@ export const ProductDetails = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 mt-10">
-      <motion.img
+      <img
         src={`https://store-api.softclub.tj/images/${product.image}`}
+        alt={product.productName}
         className="bg-gray-100 p-10 rounded"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
       />
 
       <div>
         <h1 className="text-2xl font-bold">{product.productName}</h1>
         <p className="mt-4 text-gray-600">{product.description}</p>
-
         <div className="text-2xl text-red-500 mt-6">
           ${product.discountPrice ?? product.price}
         </div>
@@ -50,7 +53,7 @@ export const ProductDetails = () => {
         <div className="flex gap-4 mt-6">
           <button
             onClick={handleAddToCart}
-            className="bg-red-500 text-white px-6 py-2 rounded"
+            className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition"
           >
             Buy Now
           </button>

@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { Card, Row, Col, Badge, Radio, Checkbox, Spin, Button } from "antd";
+import { HeartOutlined, HeartFilled, EyeOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useGetProductsQuery } from "../store/api/productApi/product";
 import { addToCart, toggleWishlist, getWishlist } from "../store/api/cardApi/cart";
-import { Loader } from "../components/layout/ui/Loader";
 import type { Product } from "../store/api/cardApi/types";
-import imgHeart from "../assets/heart small.png";
-import { Eye } from "lucide-react";
 
-export const Shop: React.FC = () => {
+const { Meta } = Card;
+
+export const Shop = () => {
   const { data, isLoading } = useGetProductsQuery();
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [brandFilter, setBrandFilter] = useState<string[]>([]);
 
-  // Initial load of wishlist from localStorage
   useEffect(() => {
     setWishlist(getWishlist());
   }, []);
@@ -22,7 +21,6 @@ export const Shop: React.FC = () => {
   const handleWishlist = (product: Product) => {
     const updated = toggleWishlist(product);
     setWishlist(updated);
-    window.dispatchEvent(new Event("storage"));
   };
 
   const handleAddToCart = (product: Product) => {
@@ -34,7 +32,10 @@ export const Shop: React.FC = () => {
     alert(`${product.productName} added to cart`);
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Spin size="large" className="flex justify-center mt-20" />;
+
+  const categories = ["All", "1", "2", "3"];
+  const brands = ["Apple", "Samsung", "Canon"];
 
   const filteredProducts = data?.data?.products.filter((p: Product) => {
     const categoryMatch = categoryFilter === "All" || p.categoryId?.toString() === categoryFilter;
@@ -42,99 +43,93 @@ export const Shop: React.FC = () => {
     return categoryMatch && brandMatch;
   });
 
-  const categories = ["All", "1", "2", "3"]; 
-  const brands = ["Apple", "Samsung", "Canon"]; 
-
   return (
-    <div className="w-[95%] mx-auto mt-10 flex gap-8">
-      <div className="w-[250px] text-sm">
-        <h3 className="font-semibold mb-3">Category</h3>
-        <div className="flex flex-col space-y-2">
+    <div className="max-w-7xl mx-auto mt-10 px-4 flex gap-8">
+      <div className="w-[250px]">
+        <h3 className="font-semibold mb-2">Categories</h3>
+        <Radio.Group
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="flex flex-col gap-2"
+        >
           {categories.map((cat) => (
-            <label key={cat} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="category"
-                value={cat}
-                checked={categoryFilter === cat}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              />
+            <Radio.Button key={cat} value={cat} className="mb-1">
               {cat === "All" ? "All" : `Category ${cat}`}
-            </label>
+            </Radio.Button>
           ))}
-        </div>
+        </Radio.Group>
 
-        <hr className="my-5" />
-        <h3 className="font-semibold mb-3">Brands</h3>
-        <div className="flex flex-col space-y-1">
+        <h3 className="font-semibold mt-4 mb-2">Brands</h3>
+        <Checkbox.Group
+          value={brandFilter}
+          onChange={(checkedValues) => setBrandFilter(checkedValues as string[])}
+          className="flex flex-col gap-1"
+        >
           {brands.map((brand) => (
-            <label key={brand} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={brandFilter.includes(brand)}
-                onChange={(e) => {
-                  if (e.target.checked) setBrandFilter([...brandFilter, brand]);
-                  else setBrandFilter(brandFilter.filter((b) => b !== brand));
-                }}
-              />
+            <Checkbox key={brand} value={brand}>
               {brand}
-            </label>
+            </Checkbox>
           ))}
-        </div>
+        </Checkbox.Group>
       </div>
-
       <div className="flex-1">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <Row gutter={[16, 16]}>
           {filteredProducts?.map((item: Product) => {
             const isWishlisted = wishlist.some((p) => p.id === item.id);
             return (
-              <motion.div
-                key={item.id}
-                whileHover={{ y: -5 }}
-                className="group relative border p-4 rounded"
-              >
-                <div className="relative">
-                
-                  <button
-                    onClick={() => handleWishlist(item)}
-                    className={`absolute top-2 right-2 transition-colors duration-200 ${
-                      isWishlisted ? "text-red-500" : "text-white"
-                    }`}
-                  >
-                    <img src={imgHeart} alt="wishlist" />
-                  </button>
+              <Col xs={24} sm={12} md={8} lg={6} key={item.id}>
+                <Badge.Ribbon
+                  text={item.price}
+                  color={item.discountPrice ? "red" : "green"}
+                >
+                  <Card
+                    hoverable
+                    className="bg-white shadow-sm hover:shadow-md transition-shadow duration-300 relative overflow-hidden"
+                    cover={
+                      <div className="relative group">
+                        <Link to={`/product/${item.id}`}>
+                          <img
+                            alt={item.productName}
+                            src={`https://store-api.softclub.tj/images/${item.image}`}
+                            className="h-56 w-full object-contain p-4 bg-gray-50 group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </Link>
 
-                  {/* Product Image */}
-                  <Link to={`/product/${item.id}`}>
-                    <img
-                      src={`https://store-api.softclub.tj/images/${item.image}`}
-                      className="h-36 mx-auto group-hover:scale-110 transition-transform duration-200"
+                        <Button
+                          type="primary"
+                          onClick={() => handleAddToCart(item)}
+                          className="absolute inset-x-1/4 bottom-4 opacity-0 group-hover:opacity-100
+                            transition-opacity duration-300 w-1/2 text-center"
+                        >
+                          Add To Cart
+                        </Button>
+                      </div>
+                    }
+                    actions={[
+                      <Button
+                        type="text"
+                        icon={isWishlisted ? <HeartFilled className="text-red-500" /> : <HeartOutlined />}
+                        onClick={() => handleWishlist(item)}
+                      />,
+                      <Link to={`/product/${item.id}`}>
+                        <Button type="text" icon={<EyeOutlined />} />
+                      </Link>,
+                    ]}
+                  >
+                    <Meta
+                      title={item.productName}
+                      description={
+                        <span className="text-red-500 font-bold">
+                          ${item.discountPrice ?? item.price}
+                        </span>
+                      }
                     />
-                  </Link>
-
-                  {/* Eye icon */}
-                  <Link to={`/product/${item.id}`} className="absolute top-2 left-2 text-black">
-                    <Eye />
-                  </Link>
-
-                  {/* Add to Cart */}
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100
-                      bg-black text-white rounded px-4 py-2 m-auto h-fit transition-opacity duration-200"
-                  >
-                    Add To Cart
-                  </button>
-                </div>
-
-                <p className="mt-2 font-medium">{item.productName}</p>
-                <span className="text-red-500 font-bold">
-                  ${item.discountPrice ?? item.price}
-                </span>
-              </motion.div>
+                  </Card>
+                </Badge.Ribbon>
+              </Col>
             );
           })}
-        </div>
+        </Row>
       </div>
     </div>
   );

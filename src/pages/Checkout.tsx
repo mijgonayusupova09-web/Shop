@@ -3,15 +3,11 @@ import React from "react";
 export const Checkout = () => {
   return (
     <div className="w-[90%] max-w-7xl mx-auto mt-16">
-
-      {/* Breadcrumb */}
       <p className="text-sm text-gray-400 mb-8">
         Product / View Cart / <span className="text-black">Checkout</span>
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-        {/* LEFT — Billing Details */}
         <div>
           <h2 className="text-2xl font-semibold mb-6">Billing Details</h2>
 
@@ -39,11 +35,7 @@ export const Checkout = () => {
             Save this information for faster check-out next time
           </label>
         </div>
-
-        {/* RIGHT — Order Summary */}
         <div className="border rounded-lg p-6 h-fit">
-
-          {/* Products */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span>LCD Monitor</span>
@@ -57,8 +49,6 @@ export const Checkout = () => {
           </div>
 
           <hr className="my-6" />
-
-          {/* Prices */}
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span>Subtotal:</span>
@@ -73,8 +63,6 @@ export const Checkout = () => {
               <span>$1750</span>
             </div>
           </div>
-
-          {/* Payment */}
           <div className="mt-6 space-y-3">
             <label className="flex items-center gap-2">
               <input type="radio" name="pay" defaultChecked />
@@ -91,8 +79,6 @@ export const Checkout = () => {
               Cash on delivery
             </label>
           </div>
-
-          {/* Coupon */}
           <div className="flex gap-3 mt-6">
             <input
               type="text"
@@ -112,11 +98,3 @@ export const Checkout = () => {
     </div>
   );
 };
-
-
-
-
-
-
-
-

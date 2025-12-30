@@ -11,11 +11,6 @@ import { Loader } from '../components/layout/ui/Loader'
 export const About = () => {
   return (
     <div className='w-[90%] m-auto mt-[60px]'>
-      <div>
-        <span className='text-[grey]'>Home</span>
-        <span className='ml-[5px]'>/</span>
-        <span className='ml-[5px]'>About</span>
-      </div>
       <div className="flex flex-col lg:flex-row justify-between mt-[50px] items-center gap-8">
         <div className="flex-1">
           <h1 className='text-[40px] font-bold'>Our Story</h1>

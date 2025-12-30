@@ -1,57 +1,60 @@
-import type { CartItem, Product } from "./types"
+import type { CartItem, Product } from "./types";
 
-const CART_KEY = "cart"
-const WISHLIST_KEY = "wishlist"
+const CART_KEY = "cart";
+const WISHLIST_KEY = "wishlist";
 
+/* ===== CART ===== */
 export const getCart = (): CartItem[] =>
-  JSON.parse(localStorage.getItem(CART_KEY) || "[]")
+  JSON.parse(localStorage.getItem(CART_KEY) || "[]");
 
 export const addToCart = (product: Product): CartItem[] => {
-  const cart = getCart()
-  const exist = cart.find(i => i.id === product.id)
+  const cart = getCart();
+  const exist = cart.find(i => i.id === product.id);
 
   if (exist) {
-    exist.quantity += 1
+    exist.quantity += 1;
   } else {
-    cart.push({ ...product, quantity: 1 })
+    cart.push({ ...product, quantity: 1 });
   }
 
-  localStorage.setItem(CART_KEY, JSON.stringify(cart))
-  return cart
-}
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  window.dispatchEvent(new Event("storage")); // ✅ Sync Navbar
+  return cart;
+};
 
 export const updateQuantity = (id: number, qty: number): CartItem[] => {
-  const cart = getCart().map(i =>
-    i.id === id ? { ...i, quantity: qty } : i
-  )
-  localStorage.setItem(CART_KEY, JSON.stringify(cart))
-  return cart
-}
+  const cart = getCart().map(i => (i.id === id ? { ...i, quantity: qty } : i));
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  window.dispatchEvent(new Event("storage"));
+  return cart;
+};
 
 export const removeItem = (id: number): CartItem[] => {
-  const cart = getCart().filter(i => i.id !== id)
-  localStorage.setItem(CART_KEY, JSON.stringify(cart))
-  return cart
-}
+  const cart = getCart().filter(i => i.id !== id);
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  window.dispatchEvent(new Event("storage"));
+  return cart;
+};
 
 export const removeAll = (): CartItem[] => {
-  localStorage.removeItem(CART_KEY)
-  return []
-}
+  localStorage.removeItem(CART_KEY);
+  window.dispatchEvent(new Event("storage"));
+  return [];
+};
 
-/* ===== Wishlist ===== */
-
+/* ===== WISHLIST ===== */
 export const getWishlist = (): Product[] =>
-  JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]")
+  JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]");
 
 export const toggleWishlist = (product: Product): Product[] => {
-  const list = getWishlist()
-  const exists = list.find(i => i.id === product.id)
+  const list = getWishlist();
+  const exists = list.find(i => i.id === product.id);
 
   const updated = exists
     ? list.filter(i => i.id !== product.id)
-    : [...list, product]
+    : [...list, product];
 
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated))
-  return updated
-}
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new Event("storage")); 
+  return updated;
+};
