@@ -8,19 +8,19 @@ import img3 from "../../assets/heart small.png";
 import img5 from "../../assets/Cart1.png";
 import { useGetProductsQuery } from "../../store/api/productApi/product";
 
+interface Product {
+  id: number;
+  productName: string;
+  // добавь другие поля если используешь
+}
+
 const Header = () => {
   const { data } = useGetProductsQuery();
-  const [cartCount, setCartCount] = useState(0);
-  const [wishCount, setWishCount] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+  const [cartCount, setCartCount] = useState<number>(0);
+  const [wishCount, setWishCount] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
 
   const updateCounts = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -47,15 +47,17 @@ const Header = () => {
       setSearchResults([]);
       return;
     }
-    const filtered = data?.data?.products?.filter((p) =>
-      p.productName.toLowerCase().includes(search.toLowerCase())
-    );
+    
+   const filtered = data?.data?.products?.filter((p: Product) =>
+  p.productName.toLowerCase().includes(search.toLowerCase())
+);
+
     setSearchResults(filtered || []);
   }, [search, data]);
 
   const handleLogOut = () => {
     localStorage.removeItem("token");
-    window.location.reload(); 
+    window.location.reload();
   };
 
   return (
@@ -64,10 +66,11 @@ const Header = () => {
         <Link to="/" className="flex items-center gap-2 text-xl font-bold">
           <img className="w-[150px]" src={img1} alt="Logo" />
         </Link>
+
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          {menuItems.map((item, i) => (
+          {menuItems.map((item) => (
             <NavLink
-              key={i}
+              key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 isActive
@@ -87,12 +90,11 @@ const Header = () => {
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-56 rounded-md border px-3 py-1.5 text-sm
-                         focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-56 rounded-md border px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-black"
             />
             {searchResults.length > 0 && (
               <div className="absolute top-full left-0 w-full bg-white border mt-1 z-50 max-h-64 overflow-y-auto shadow-lg rounded">
-                {searchResults.map((p: any) => (
+                {searchResults.map((p: Product) => (
                   <Link
                     key={p.id}
                     to={`/product/${p.id}`}
@@ -105,6 +107,7 @@ const Header = () => {
               </div>
             )}
           </div>
+
           <Link to="/wishlist" className="relative text-xl">
             <img src={img3} alt="Wishlist" />
             <AnimatePresence>
@@ -113,9 +116,7 @@ const Header = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -right-2 -top-2
-                             h-4 w-4 rounded-full bg-red-500
-                             text-xs text-white flex items-center justify-center"
+                  className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center"
                 >
                   {wishCount}
                 </motion.span>
@@ -131,33 +132,33 @@ const Header = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="absolute -right-2 -top-2
-                             h-4 w-4 rounded-full bg-red-500
-                             text-xs text-white flex items-center justify-center"
+                  className="absolute -right-2 -top-2 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center"
                 >
                   {cartCount}
                 </motion.span>
               )}
             </AnimatePresence>
           </Link>
-          {localStorage.getItem("token") ? (
-            <div className="flex items-center gap-2">
-              <LogOut
-                className="text-xl cursor-pointer"
-                onClick={handleLogOut}
-                title="Log Out"
-              />
-            </div>
-          ) : ""}
 
-              <Link to={localStorage.getItem("token") ? "/account" : "/login"} className="text-xl">
-                <img src={img2} alt="User" className="w-8 h-8 rounded-full" />
-              </Link>
+          {localStorage.getItem("token") && (
+            <button onClick={handleLogOut} title="Log Out">
+              <LogOut className="text-xl cursor-pointer" />
+            </button>
+          )}
+
+          <Link
+            to={localStorage.getItem("token") ? "/account" : "/login"}
+            className="text-xl"
+          >
+            <img src={img2} alt="User" className="w-8 h-8 rounded-full" />
+          </Link>
+
           <button className="md:hidden text-xl" onClick={() => setOpen(!open)}>
             {open ? <X /> : <Menu />}
           </button>
         </div>
       </div>
+
       <AnimatePresence>
         {open && (
           <motion.nav
@@ -167,9 +168,9 @@ const Header = () => {
             className="md:hidden bg-white border-t overflow-hidden"
           >
             <div className="flex flex-col px-4 py-2 gap-2">
-              {menuItems.map((item, i) => (
+              {menuItems.map((item) => (
                 <NavLink
-                  key={i}
+                  key={item.path}
                   to={item.path}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
@@ -181,6 +182,7 @@ const Header = () => {
                   {item.label}
                 </NavLink>
               ))}
+
               <input
                 type="text"
                 placeholder="Search products..."
@@ -188,9 +190,10 @@ const Header = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full rounded-md border px-3 py-1.5 text-sm mt-2"
               />
+
               {searchResults.length > 0 && (
                 <div className="w-full bg-white border mt-1 max-h-64 overflow-y-auto rounded">
-                  {searchResults.map((p: any) => (
+                  {searchResults.map((p: Product) => (
                     <Link
                       key={p.id}
                       to={`/product/${p.id}`}

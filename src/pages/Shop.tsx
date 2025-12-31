@@ -8,8 +8,14 @@ import type { Product } from "../store/api/cardApi/types";
 
 const { Meta } = Card;
 
+interface ProductsResponse {
+  data: {
+    products: Product[];
+  };
+}
+
 export const Shop = () => {
-  const { data, isLoading } = useGetProductsQuery();
+  const { data, isLoading } = useGetProductsQuery() as { data?: ProductsResponse; isLoading: boolean };
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [brandFilter, setBrandFilter] = useState<string[]>([]);
@@ -35,13 +41,8 @@ export const Shop = () => {
   if (isLoading) return <Spin size="large" className="flex justify-center mt-20" />;
 
   const categories = ["All", "1", "2", "3"];
-  const brands = ["Apple", "Samsung", "Canon"];
 
-  const filteredProducts = data?.data?.products.filter((p: Product) => {
-    const categoryMatch = categoryFilter === "All" || p.categoryId?.toString() === categoryFilter;
-    const brandMatch = brandFilter.length === 0 || (p.brand && brandFilter.includes(p.brand));
-    return categoryMatch && brandMatch;
-  });
+
 
   return (
     <div className="max-w-7xl mx-auto mt-10 px-4 flex gap-8">
@@ -58,23 +59,11 @@ export const Shop = () => {
             </Radio.Button>
           ))}
         </Radio.Group>
-
-        <h3 className="font-semibold mt-4 mb-2">Brands</h3>
-        <Checkbox.Group
-          value={brandFilter}
-          onChange={(checkedValues) => setBrandFilter(checkedValues as string[])}
-          className="flex flex-col gap-1"
-        >
-          {brands.map((brand) => (
-            <Checkbox key={brand} value={brand}>
-              {brand}
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
       </div>
+
       <div className="flex-1">
         <Row gutter={[16, 16]}>
-          {filteredProducts?.map((item: Product) => {
+          {data.data?.products.map((item: Product) => {
             const isWishlisted = wishlist.some((p) => p.id === item.id);
             return (
               <Col xs={24} sm={12} md={8} lg={6} key={item.id}>

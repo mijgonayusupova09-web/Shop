@@ -3,13 +3,21 @@ import { HeartOutlined, HeartFilled, EyeOutlined, ShoppingCartOutlined } from "@
 import { Card, Button, Row, Col, Spin } from "antd";
 import { Link } from "react-router-dom";
 import { getWishlist, toggleWishlist, addToCart } from "../store/api/cardApi/cart";
-import { useGetProductsQuery } from "../store/api/productApi/product";
+import { Product, useGetProductsQuery } from "../store/api/productApi/product";
 
 const { Meta } = Card;
 
 export const Wishlist = () => {
+  interface ProductsResponse {
+    data: {
+      products: Product[];
+    };
+  }
+
+  const { data, isLoading } = useGetProductsQuery() as { data?: ProductsResponse; isLoading: boolean };
+
   const [wishlist, setWishlist] = useState<any[]>([]);
-  const { data, isLoading } = useGetProductsQuery();
+
 
   const updateWishlist = () => setWishlist(getWishlist());
 
@@ -35,7 +43,11 @@ export const Wishlist = () => {
 
   if (isLoading) return <Spin size="large" className="flex justify-center mt-20" />;
 
-  const wishlistProducts = data?.data?.products?.filter(p => wishlist.some(w => w.id === p.id));
+  const wishlistProducts = data?.data?.products?.filter(p =>
+    wishlist.some(w => w.id === p.id)
+  );
+
+
 
   if (!wishlistProducts || wishlistProducts.length === 0) {
     return (

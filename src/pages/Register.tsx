@@ -4,6 +4,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { useRegisterMutation } from "../store/api/authApi/auth";
 import { setToken } from "../store/api/slices/authSlice";
 
+// Тип ответа от API регистрации
+interface RegisterResponse {
+  token: string ;
+  data: string | null
+  // другие поля, если есть, например user
+}
+
 const Register = () => {
   const [form, setForm] = useState({
     fullName: "",
@@ -15,9 +22,10 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      // Указываем, что unwrap вернёт RegisterResponse
       const res = await register(form).unwrap();
       dispatch(setToken(res.token));
       navigate("/");
@@ -38,52 +46,43 @@ const Register = () => {
         <p className="text-center text-gray-500 mb-6">
           Sign up to get started
         </p>
+
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Full Name
-          </label>
+          <label className="block text-sm font-medium mb-1">Full Name</label>
           <input
             type="text"
             placeholder="John Doe"
             value={form.fullName}
-            onChange={(e) =>
-              setForm({ ...form, fullName: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
             required
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Email
-          </label>
+          <label className="block text-sm font-medium mb-1">Email</label>
           <input
             type="email"
             placeholder="example@mail.com"
             value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
             required
           />
         </div>
+
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-1">
-            Password
-          </label>
+          <label className="block text-sm font-medium mb-1">Password</label>
           <input
             type="password"
             placeholder="••••••••"
             value={form.password}
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
             required
           />
         </div>
+
         <button
           type="submit"
           disabled={isLoading}
@@ -91,6 +90,7 @@ const Register = () => {
         >
           {isLoading ? "Creating account..." : "Register"}
         </button>
+
         {error && (
           <p className="text-sm text-red-500 text-center mt-3">
             Registration failed. Try again.

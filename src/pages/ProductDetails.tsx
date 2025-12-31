@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShoppingCartOutlined, ZoomInOutlined, HeartOutlined, HeartFilled } from "@ant-design/icons";
-import { Button, message, Input, Select } from "antd";
+import { Button, message, Select } from "antd";
 import imgl from "../assets/Cart1.png";
 import { addToCart, toggleWishlist, getWishlist } from "../store/api/cardApi/cart";
 import type { Product as ProductType } from "../store/api/cardApi/types";
@@ -34,7 +34,8 @@ const colorSwatches = [
 ];
 
 const ProductDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id?: string }>();
+  if (!id) return <p className="text-center mt-20">Product ID is missing</p>;
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -60,16 +61,13 @@ const ProductDetails = () => {
 
   if (!product) return <p className="text-center mt-20">Loading...</p>;
 
-  // Prepare filtered images
   const images =
     product.images?.length
       ? product.images.map((img) => `https://store-api.softclub.tj/images/${img.images}`)
       : fallbackImages;
 
   const filteredImages = images.filter((img) => {
-    // Search filter
     const matchesSearch = product.productName.toLowerCase().includes(search.toLowerCase());
-    // Price filter
     const price = product.discountPrice ?? product.price;
     let matchesPrice = true;
     if (priceFilter === "low") matchesPrice = price < 50;

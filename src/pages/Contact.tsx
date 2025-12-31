@@ -1,4 +1,3 @@
-import React from "react";
 import { Input, Button, Card } from "antd";
 import img1 from "../assets/icons-phone.png";
 const { TextArea } = Input;

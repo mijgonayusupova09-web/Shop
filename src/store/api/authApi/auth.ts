@@ -2,6 +2,7 @@ import { baseApi } from "../../../utils/api";
 
 export interface AuthResponse {
   data: string;
+  token: string
 }
 
 export const authApi = baseApi.injectEndpoints({

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button, Modal } from "antd";
-import imgGoogle from "../assets/Icon-Google.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../store/api/authApi/auth";
 
