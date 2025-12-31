@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-  "build": "npx tsc -b && vite build",
-      "lint": "eslint .",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
     "preview": "vite preview"
-  },
-  "dependencies": {
+  },c
+  "dependencies": {ommit -m ""
     "@ant-design/icons": "^6.1.0",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.1.18",
