@@ -3,7 +3,6 @@ import type { CartItem, Product } from "./types";
 const CART_KEY = "cart";
 const WISHLIST_KEY = "wishlist";
 
-/* ===== CART ===== */
 export const getCart = (): CartItem[] =>
   JSON.parse(localStorage.getItem(CART_KEY) || "[]");
 
@@ -18,7 +17,7 @@ export const addToCart = (product: Product): CartItem[] => {
   }
 
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  window.dispatchEvent(new Event("storage")); // ✅ Sync Navbar
+  window.dispatchEvent(new Event("storage")); 
   return cart;
 };
 
@@ -42,7 +41,6 @@ export const removeAll = (): CartItem[] => {
   return [];
 };
 
-/* ===== WISHLIST ===== */
 export const getWishlist = (): Product[] =>
   JSON.parse(localStorage.getItem(WISHLIST_KEY) || "[]");
 

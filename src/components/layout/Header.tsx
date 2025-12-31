@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import img1 from "../../assets/logo.jpg";
 import img2 from "../../assets/user.png";
 import img3 from "../../assets/heart small.png";
@@ -15,6 +15,12 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const updateCounts = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -41,21 +47,23 @@ const Header = () => {
       setSearchResults([]);
       return;
     }
-    const filtered = data?.data?.products?.filter(p =>
+    const filtered = data?.data?.products?.filter((p) =>
       p.productName.toLowerCase().includes(search.toLowerCase())
     );
     setSearchResults(filtered || []);
   }, [search, data]);
 
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    window.location.reload(); 
+  };
+
   return (
     <header className="w-full border-b bg-white sticky top-0 z-50">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-xl font-bold">
           <img className="w-[150px]" src={img1} alt="Logo" />
         </Link>
-
-        {/* Desktop Menu */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {menuItems.map((item, i) => (
             <NavLink
@@ -72,15 +80,13 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Search + Icons + Burger */}
         <div className="flex items-center gap-4 relative">
-          {/* Search */}
           <div className="relative hidden md:block">
             <input
               type="text"
               placeholder="Search products..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-56 rounded-md border px-3 py-1.5 text-sm
                          focus:outline-none focus:ring-1 focus:ring-black"
             />
@@ -99,8 +105,6 @@ const Header = () => {
               </div>
             )}
           </div>
-
-          {/* Wishlist */}
           <Link to="/wishlist" className="relative text-xl">
             <img src={img3} alt="Wishlist" />
             <AnimatePresence>
@@ -119,7 +123,6 @@ const Header = () => {
             </AnimatePresence>
           </Link>
 
-          {/* Cart */}
           <Link to="/cart" className="relative text-xl">
             <img src={img5} alt="Cart" />
             <AnimatePresence>
@@ -137,23 +140,24 @@ const Header = () => {
               )}
             </AnimatePresence>
           </Link>
+          {localStorage.getItem("token") ? (
+            <div className="flex items-center gap-2">
+              <LogOut
+                className="text-xl cursor-pointer"
+                onClick={handleLogOut}
+                title="Log Out"
+              />
+            </div>
+          ) : ""}
 
-          {/* User */}
-          <Link
-            to={localStorage.getItem("token") ? "/account" : "/register"}
-            className="text-xl"
-          >
-            <img src={img2} alt="User" />
-          </Link>
-
-          {/* Burger Button */}
+              <Link to={localStorage.getItem("token") ? "/account" : "/login"} className="text-xl">
+                <img src={img2} alt="User" className="w-8 h-8 rounded-full" />
+              </Link>
           <button className="md:hidden text-xl" onClick={() => setOpen(!open)}>
             {open ? <X /> : <Menu />}
           </button>
         </div>
       </div>
-
-      {/* Mobile Menu */}
       <AnimatePresence>
         {open && (
           <motion.nav
@@ -177,13 +181,11 @@ const Header = () => {
                   {item.label}
                 </NavLink>
               ))}
-
-              {/* Mobile Search */}
               <input
                 type="text"
                 placeholder="Search products..."
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 className="w-full rounded-md border px-3 py-1.5 text-sm mt-2"
               />
               {searchResults.length > 0 && (

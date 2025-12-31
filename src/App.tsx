@@ -10,9 +10,9 @@ import { About } from "./pages/About"
 import { Contact } from "./pages/Contact"
 import { NotFound } from "./pages/NotFound"
 import { Login } from "./pages/Login"
-import { ProductDetails } from "./pages/ProductDetails"
 import Register from "./pages/Register"
 import { Home } from "./pages/Home"
+import ProductDetails from "./pages/ProductDetails"
 
 const App = () => {
   return (
